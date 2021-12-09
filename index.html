@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+  
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+
+
+    <script type="text/javascript">
+var initX, initY, firstX, firstY;
+
+
+// function stripHTML(text) {
+//         // please do not edit this function
+//         var data = $("<div/>").html(text).text();
+//         return data;
+//     }
+
+//function to get position of element and convert into years value when we drag, drop on click on mouse
+function getVal() {
+
+    var _startYear = 0;
+    var _endYear = 0;
+
+    var p = document.getElementById('timeline').offsetLeft;
+
+
+
+    if (p <= 566 && p >= 490) {
+        _startYear = 1600;
+        _endYear = 1624;
+    } else if (p <= 491 && p >= 415) {
+        _startYear = 1625;
+        _endYear = 1649;
+    } else if (p <= 414 && p >= 338) {
+        _startYear = 1650;
+        _endYear = 1674;
+    } else if (p <= 337 && p >= 262) {
+        _startYear = 1675;
+        _endYear = 1699;
+    } else if (p <= 261 && p >= 185) {
+        _startYear = 1700;
+        _endYear = 1724;
+    } else if (p <= 184 && p >= 109) {
+        _startYear = 1725;
+        _endYear = 1749;
+    } else if (p <= 108 && p >= 32) {
+        _startYear = 1750;
+        _endYear = 1774;
+    } else if (p <= 31 && p >= -45) {
+        _startYear = 1775;
+        _endYear = 1799;
+    } else if (p <= -46 && p >= -120) {
+        _startYear = 1800;
+        _endYear = 1824;
+    } else if (p <= -121 && p >= -198) {
+        _startYear = 1825;
+        _endYear = 1849;
+    } else if (p <= -199 && p >= -274) {
+        _startYear = 1850;
+        _endYear = 1874;
+    } else if (p <= -275 && p >= -350) {
+        _startYear = 1875;
+        _endYear = 1899;
+    } else if (p <= -351 && p >= -426) {
+        _startYear = 1900;
+        _endYear = 1924;
+    } else if (p <= -427 && p >= -503) {
+        _startYear = 1925;
+        _endYear = 1949;
+    } else if (p <= -504 && p >= -580) {
+        _startYear = 1950;
+        _endYear = 1974;
+    } else if (p <= -581 && p >= -656) {
+        _startYear = 1975;
+        _endYear = 2000;
+    }
+
+    var r = "";
+
+    $(".weight-value").html("<span>from-> " + _startYear + " to-> " + _endYear + "</span>");
+
+    return {
+        start: _startYear,
+        end: _endYear
+    };
+
+
+}
+
+function seedData(seed, startYear, endYear) {
+    var data = [];
+
+    function getRandomArbitrary(min, max) {
+        return parseInt(Math.random() * (max - min) + min);
+    }
+
+    function getRandomColor() {
+        return Math.floor(Math.random() * 16777215).toString(16);
+    }
+    for (let i = 0; i < seed; i++) {
+        data.push({
+            color: getRandomColor(),
+            year: getRandomArbitrary(startYear, endYear)
+        });
+    }
+    return data;
+}
+
+//get timeline data as per seed, start and end year and append on div
+function getTimelineData(seed, startYear, endYear) {
+
+    var imageContainer = document.getElementById("image-container");
+    imageContainer.innerHTML = "";
+
+    var data = seedData(seed, startYear, endYear);
+
+
+    data.forEach(function(item) {
+
+        var boardDiv = document.createElement("div");
+
+        boardDiv.className = "image-block";
+        boardDiv.style.backgroundColor = "#" + item.color;
+        boardDiv.innerHTML = "year " + item.year;
+
+        imageContainer.appendChild(boardDiv);
+    });
+
+
+
+}
+
+//function to drag items using mouse
+function dragIt(e) {
+
+    if (initX <= 572 && initX >= -649) {
+        this.style.left = initX + e.pageX - firstX + 'px';
+    } else {
+        if (initX >= 572) {
+            initX = 572;
+        }
+        if (initX <= -649) {
+            initX = -649;
+        }
+        this.style.left = initX + e.pageX - firstX + 'px';
+
+
+    }
+    var result = getVal();
+    //set seed, start and end year 
+    getTimelineData(5, result.start, result.end);
+
+    //this.style.top = initY + e.pageY - firstY + 'px';
+}
+
+// function to move items when click on the years
+function moveIt(e) {
+    getVal();
+    var ruler = document.getElementById("timeline");
+    var lastElem = '2000';
+    var leftPositionOffset = 612;
+    var start, end;
+    var initialOffset = 1;
+    var id = null;
+    var pos = 0;
+    initialOffset = this.id;
+
+    if (this.innerHTML == lastElem) //last element
+    {
+        leftPositionOffset = 684;
+    }
+
+    initialOffset = leftPositionOffset - initialOffset * 76;
+    start = initX;
+    end = initialOffset;
+    initX = initialOffset;
+
+
+    //logic for smooth drag when click on year
+    clearInterval(id);
+    id = setInterval(frame, 1);
+
+    function frame() {
+        if (start > end) {
+            if (start == end) {
+                clearInterval(id);
+            } else {
+                start--;
+
+                ruler.style.left = start + 'px';
+                var result = getVal();
+                //set seed, start and end year. currently 5 is set as default seed i.e only 5 items will display
+                getTimelineData(5, result.start, result.end);
+            }
+
+        } else {
+            if (start == end) {
+                clearInterval(id);
+            } else {
+                start++;
+
+                ruler.style.left = start + 'px';
+                var result = getVal();
+                //set seed, start and end year. currently 5 is set as default seed i.e only 5 items will display
+                getTimelineData(5, result.start, result.end);
+            }
+
+        }
+
+
+
+    }
+
+
+}
+
+
+//support for touch on mobile screen
+function swipeIt(e) {
+
+    var contact = e.touches;
+    if (initX <= 572 && initX >= -649) {
+        this.style.left = initX + contact[0].pageX - firstX + 'px';
+    } else {
+        if (initX >= 572) {
+            initX = 572;
+        }
+        if (initX <= -649) {
+            initX = -649;
+        }
+        this.style.left = initX + e.pageX - firstX + 'px';
+    }
+    var result = getVal();
+
+    getTimelineData(5, result.start, result.end);
+
+}
+
+
+// get offset of the current element
+function getOffset(el) {
+    var _x = 0;
+    var _y = 0;
+    while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+        _x += el.offsetLeft - el.scrollLeft;
+        _y += el.offsetTop - el.scrollTop;
+        el = el.offsetParent;
+    }
+    return {
+        top: _y,
+        left: _x
+    };
+}
+
+
+
+//initially load the timeline 
+function load_steps() {
+
+    var main_steps = "";
+    var k = 1;
+    for (var i = 1600; i <= 2000; i++) {
+
+        var num;
+
+        if (i == 1600) {
+            main_steps += "<div  class='main-step'><span id='" + k + "' class='years'>" + i + "</span></div>";
+            for (var j = 1; j <= 4; j++) {
+                main_steps += "<span class='sub-step'></span>";
+            }
+            k++;
+        } else {
+            if (i % 25 == 0) {
+                main_steps += "<div class='main-step'><span id='" + k + "' class='years'>" + i + "</span></div>";
+                for (var j = 1; j <= 4; j++) {
+                    main_steps += "<span class='sub-step'></span>";
+                }
+                k++;
+            }
+        }
+
+
+
+
+    }
+    document.getElementById("timeline").innerHTML = main_steps;
+
+
+
+}
+
+
+
+$(document).ready(function() {
+
+
+    load_steps();
+
+    var object = document.getElementById("timeline");
+    var years = document.querySelectorAll(".years");
+
+
+
+    object.addEventListener('mousedown', function(e) {
+
+        e.preventDefault();
+        initX = this.offsetLeft;
+        initY = this.offsetTop;
+        firstX = e.pageX;
+        firstY = e.pageY;
+
+        this.addEventListener('mousemove', dragIt, false);
+
+
+
+        window.addEventListener('mouseup', function() {
+            object.removeEventListener('mousemove', dragIt, false);
+        }, false);
+
+    }, false);
+
+    object.addEventListener('touchstart', function(e) {
+
+        e.preventDefault();
+        initX = this.offsetLeft;
+        initY = this.offsetTop;
+        var touch = e.touches;
+        firstX = touch[0].pageX;
+        firstY = touch[0].pageY;
+
+
+        this.addEventListener('touchmove', swipeIt, false);
+
+        window.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            object.removeEventListener('touchmove', swipeIt, false);
+        }, false);
+
+    }, false);
+
+
+
+
+    years.forEach(function(elem) {
+        elem.addEventListener('click', moveIt, false);
+
+    });
+
+});
+
+      </script>
+</head>
+<body>
+    
+    <div class="timeline-scale">
+        <div class="ui-widget horizontal-ladder">
+          <div id="timeline" class="ui-widget-content weight-ladder" style="left: 0px;  flex: 1 0 150px;"> 
+      
+            <!-- starting horizontal ruler --> 
+      
+      
+      
+            <!-- ending the horizontal ruler --> 
+          </div>
+         
+      
+        </div>
+        <div class='weight-value'></div>
+      </div>
+
+      <div id="image-container" class="image-container">
+         
+      </div>
+</body>
+</html>
